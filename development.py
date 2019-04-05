@@ -1,33 +1,24 @@
-from troposphere import Base64, FindInMap, GetAtt, Join, Output
-from troposphere import Parameter, Ref, Tags, Template
-from troposphere.autoscaling import Metadata
-from troposphere.ec2 import PortRange, NetworkAcl, Route, \
-    VPCGatewayAttachment, SubnetRouteTableAssociation, Subnet, RouteTable, \
-    VPC, NetworkInterfaceProperty, NetworkAclEntry, \
-    SubnetNetworkAclAssociation, EIP, Instance, InternetGateway, \
-    SecurityGroupRule, SecurityGroup
-from troposphere.policies import CreationPolicy, ResourceSignal
-from troposphere.cloudformation import Init, InitFile, InitFiles, \
-    InitConfig, InitService, InitServices
+from troposphere import Output, Ref, Tags, Template
+from troposphere.ec2 import PortRange, NetworkAcl, Route, VPCGatewayAttachment, \
+    VPC, NetworkAclEntry, InternetGateway
 
 template = Template()
 
 template.add_description("Service VPC")
+
 template.add_metadata({
     "DependsOn": [],
     "Environment": "Development",
     "StackName": "Development-VPC",
 })
 
-ref_stack_id = Ref('AWS::StackId')
-
-internetgateway = template.add_resource(InternetGateway(
+internet_gateway = template.add_resource(InternetGateway(
     "InternetGateway",
     Tags=Tags(
         Environment="Development", Name="Development-InternetGateway")
 ))
 
-VPC = template.add_resource(
+vpc = template.add_resource(
     VPC(
         'VPC',
         CidrBlock='10.0.0.0/16',
@@ -37,16 +28,16 @@ VPC = template.add_resource(
         Tags=Tags(
             Environment="Development", Name="Development-ServiceVPC")))
 
-gatewayattachment = template.add_resource(VPCGatewayAttachment(
-    "GatewayAttachment",
+gateway_attachment = template.add_resource(VPCGatewayAttachment(
+    "VpcGatewayAttachment",
     VpcId=Ref("VPC"),
     InternetGatewayId=Ref("InternetGateway"),
 ))
 
-networkAcl = template.add_resource(
+network_acl = template.add_resource(
     NetworkAcl(
-        'NetworkAcl',
-        VpcId=Ref(VPC),
+        'VpcNetworkAcl',
+        VpcId=Ref(vpc),
         Tags=Tags(
             Environment="Development", Name="Development-NetworkAcl"),
     ))
@@ -54,8 +45,8 @@ networkAcl = template.add_resource(
 VpcNetworkAclInboundRule = template.add_resource(
     NetworkAclEntry(
         'VpcNetworkAclInboundRule',
-        NetworkAclId=Ref(networkAcl),
-        RuleNumber='100',
+        NetworkAclId=Ref(network_acl),
+        RuleNumber=100,
         Protocol='6',
         PortRange=PortRange(To='443', From='443'),
         Egress='false',
@@ -63,15 +54,21 @@ VpcNetworkAclInboundRule = template.add_resource(
         CidrBlock='0.0.0.0/0',
     ))
 
-VpcNetworkAclOutboundRule = template.add_resource(
+network_acl_outbound_rule = template.add_resource(
     NetworkAclEntry(
         'VpcNetworkAclOutboundRule',
-        NetworkAclId=Ref(networkAcl),
-        RuleNumber='200',
+        NetworkAclId=Ref(network_acl),
+        RuleNumber=200,
         Protocol='6',
         Egress='true',
         RuleAction='allow',
         CidrBlock='0.0.0.0/0',
     ))
+
+# Outputs
+template.add_output([
+    Output('InternetGateway', Value=Ref(internet_gateway)),
+    Output('VPCID', Value=Ref(vpc))
+])
 
 print(template.to_json())
