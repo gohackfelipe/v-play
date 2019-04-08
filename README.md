@@ -24,6 +24,7 @@ This project was builded using virtualenv. So, first we need install them.
 Then we need run virtual env following the commands above:
 
 ```
+virtualenv ENV
 source /path/to/ENV/bin/activate
 ```
 
