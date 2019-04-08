@@ -109,9 +109,9 @@ def generate(env, output):
         print(template.to_json())
         logging.info('Printing the cloudformation content on screen.')
     else:
-        createFile(env, output, template.to_json())
+        createFile(output, template.to_json())
 
-def createFile(env, path_file, content):
+def createFile(path_file, content):
     if not os.path.exists(os.path.dirname(path_file)):
         try:
             os.makedirs(os.path.dirname(path_file))
