@@ -34,10 +34,19 @@ pip install -r requirements.txt
 
 ## Running
 
+```
+# It'll print the cloudformation content to Developement Enviroment.
+
+python app.py --env Development 
+
+# It'll create a file at folder output.
+
+python app.py --env Development --output ./output/template_developement.json 
+```
 
 ## Authors
 
-* **Felipe Ribeiro**  - [My Website](https://feliperibeiro.dev)
+* **Felipe Ribeiro**
 
 ## License
 
