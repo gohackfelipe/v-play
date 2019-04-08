@@ -1,12 +1,13 @@
 # v-play
 
-Here we are. First all.. Thanks for to share the knowlodge!
+Viaplay team, thanks for to share the knowlodge! :)
 More one powerful library to script our infrastructure using python.
 
 ## Getting Started
 
-In the root folder of this project, there are three files respectively. 
-Each one correspond to your own json files separated by enviroment.
+Note that both json files have the same AWS resources.
+
+The troposphere library allows for easier creation of the AWS CloudFormation JSON by writing Python code to describe the AWS resources.
 
 
 ### Prerequisites
